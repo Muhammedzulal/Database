@@ -17,16 +17,23 @@ namespace Database
             InitializeComponent();
         }
 
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
+       
         ProductDal _productDal = new ProductDal();
-        private void Form1_Load(object sender, EventArgs e)
+
+        //Veritabanından verileri çekme
+        private void LoadProducts()
         {
             dataGridView1.DataSource = _productDal.GetAll();
         }
 
+        //Form yüklendiğinde verileri çekme
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            LoadProducts();
+        }
+
+
+        //Product ekleme    
         private void btnAdd_Click(object sender, EventArgs e)
         {
             _productDal.Add(new Product()
@@ -35,8 +42,42 @@ namespace Database
                 UnitPrice = Convert.ToDecimal(txtBoxPrice.Text),
                 StockAmount = Convert.ToInt32(txtBoxAmount.Text)
             });
-            dataGridView1.DataSource = _productDal.GetAll();
+            LoadProducts();
             MessageBox.Show("Product Added");
         }
+
+        //Seçilen Product'u boxlara yükleme
+        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            txtBoxNameU.Text = dataGridView1.CurrentRow.Cells[1].Value.ToString();
+            txtBoxPriceU.Text = dataGridView1.CurrentRow.Cells[2].Value.ToString();
+            txtBoxAmountU.Text = dataGridView1.CurrentRow.Cells[3].Value.ToString();
+        }
+
+        //Product Güncelleme
+        private void btnUpdate_Click(object sender, EventArgs e)
+        {
+            Product product = new Product()
+            {
+                Id = Convert.ToInt32(dataGridView1.CurrentRow.Cells[0].Value),
+                Name = txtBoxNameU.Text,
+                UnitPrice = Convert.ToDecimal(txtBoxPriceU.Text),
+                StockAmount = Convert.ToInt32(txtBoxAmountU.Text)
+            };
+            _productDal.Update(product);
+            LoadProducts();
+        }
+        //Product Silme
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+            int id = Convert.ToInt32(dataGridView1.CurrentRow.Cells[0].Value);
+            _productDal.Delete(id);
+            LoadProducts();
+            txtBoxNameU.Clear();
+            txtBoxPriceU.Clear();
+            txtBoxAmountU.Clear();
+            MessageBox.Show("Product Deleted");
+        }
+
     }
 }
