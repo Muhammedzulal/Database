@@ -10,15 +10,24 @@ namespace Database
 {
     public class ProductDal
     {
+        //Veritabanı bağlantısı
+        SqlConnection _connection = new SqlConnection(@"server=(localdb)\mssqllocaldb;initial catalog=ETrade;integrated security=true");
+
+        //Bağlantı kontrolü
+        private void ConnetionControl()
+        {
+            if (_connection.State == ConnectionState.Closed)
+            {
+                _connection.Open();
+            }
+        }
+
+        //List <Product> kullanarak verileri çekme
         public List<Product> GetAll()
         {
-            SqlConnection connection = new SqlConnection(@"server=(localdb)\mssqllocaldb;initial catalog=ETrade;integrated security=true");
-            if (connection.State == ConnectionState.Closed)//is the connection closed?
-            {
-                connection.Open();
-            }
+            ConnetionControl();
 
-            SqlCommand command = new SqlCommand("select * from Products", connection);
+            SqlCommand command = new SqlCommand("select * from Products", _connection);
             SqlDataReader reader = command.ExecuteReader();
 
             List<Product> products = new List<Product>();
@@ -34,24 +43,36 @@ namespace Database
             }
 
             reader.Close();
-            connection.Close();
+            _connection.Close();
             return products;
         }
 
+
+        //DataTable kullanarak verileri çekme
         public DataTable GetAll2()
         {
-            SqlConnection connection = new SqlConnection(@"server=(localdb)\mssqllocaldb;initial catalog=ETrade;integrated security=true");
-            if (connection.State == ConnectionState.Closed)//is the connection closed?
-            {
-                connection.Open();
-            }
-            SqlCommand command = new SqlCommand("select * from Products", connection);
+            ConnetionControl();
+
+            SqlCommand command = new SqlCommand("select * from Products", _connection);
             SqlDataReader reader = command.ExecuteReader();
             DataTable dataTable = new DataTable();
             dataTable.Load(reader);
             reader.Close();
-            connection.Close();
+            _connection.Close();
             return dataTable;
+        }
+
+
+        public void Add(Product product)
+        {
+            ConnetionControl();
+            SqlCommand command = new SqlCommand(
+                "insert into Products values(@name,@unitPrice,@stockAmount)", _connection);
+            command.Parameters.AddWithValue("@name", product.Name);
+            command.Parameters.AddWithValue("@unitPrice",product.UnitPrice);
+            command.Parameters.AddWithValue("@stockAmount", product.StockAmount);
+            command.ExecuteNonQuery();
+            _connection.Close();
         }
     }
 }
