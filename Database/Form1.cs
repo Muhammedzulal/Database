@@ -43,6 +43,9 @@ namespace Database
                 StockAmount = Convert.ToInt32(txtBoxAmount.Text)
             });
             LoadProducts();
+            txtBoxName.Clear();
+            txtBoxPrice.Clear();
+            txtBoxAmount.Clear();
             MessageBox.Show("Product Added");
         }
 
@@ -65,7 +68,11 @@ namespace Database
                 StockAmount = Convert.ToInt32(txtBoxAmountU.Text)
             };
             _productDal.Update(product);
+            txtBoxNameU.Clear();
+            txtBoxPriceU.Clear();
+            txtBoxAmountU.Clear();
             LoadProducts();
+            MessageBox.Show("Product Updated");
         }
         //Product Silme
         private void btnDelete_Click(object sender, EventArgs e)
